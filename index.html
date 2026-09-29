@@ -487,14 +487,6 @@ function rerollOne(idx){
 async function generateAll(){
   if(!state.sourceFile) return;
 
-  const token = appTokenInput.value.trim();
-
-  if(!token){
-    alert('APP_TOKENを入力してください');
-    appTokenInput.focus();
-    return;
-  }
-
   const generateBtn = $('#generate');
   const againBtn = $('#again');
 
@@ -508,9 +500,6 @@ async function generateAll(){
 
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
-      headers: {
-        'x-app-token': token
-      },
       body: formData
     });
 

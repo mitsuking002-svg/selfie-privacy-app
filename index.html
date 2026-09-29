@@ -149,7 +149,9 @@ appTokenInput.addEventListener('input', () => {
   }
 });
 const state = {
-  img: null,
+    sourceFile: null,
+  　img: null,
+
   fileBase: 'privacy',
   level: 'medium',
   outfit: true,
@@ -211,6 +213,7 @@ function loadFile(file){
   const url = URL.createObjectURL(file);
   const img = new Image();
   img.onload = () => {
+    state.sourceFile = file;
     state.img = img;
     state.fileBase = (file.name || 'privacy').replace(/\.[^.]+$/, '');
     $('#fileName').textContent = file.name;

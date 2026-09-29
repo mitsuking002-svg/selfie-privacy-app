@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Selfie Privacy Lab v0.3</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--text:#101828;--muted:#667085;--line:#e4e7ec;
+  --a:#16a6a0;--a2:#08786f;--dark:#0d201f;--soft:#eef7f6;--good:#e8fff8;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#effefd 0,#f6f8fb 42%);color:var(--text)}
+button,input{font:inherit}
+main{padding:22px 14px 60px;min-height:100vh}
+.container{width:min(1240px,100%);margin:auto}
+.header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--a2));display:grid;place-items:center;color:white;font-weight:900;box-shadow:0 12px 30px #16a6a03d}
+h1{margin:0;font-size:clamp(22px,4vw,34px);letter-spacing:-.03em}.sub{font-size:12px;color:var(--muted);margin-top:3px}.badge{font-size:12px;border:1px solid #b9f4eb;background:#e9fffb;color:#08786f;padding:7px 10px;border-radius:999px;font-weight:800;white-space:nowrap}
+.layout{display:grid;grid-template-columns:380px 1fr;gap:18px;align-items:start}
+.card{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 16px 40px #10182814}.inside{padding:20px}.title{font-size:14px;font-weight:900;margin-bottom:12px}.sp{height:18px}
+.drop{border:2px dashed #cdd5df;border-radius:20px;min-height:170px;display:grid;place-items:center;text-align:center;background:#fbfcfd;padding:20px;transition:.18s}.drop.drag{border-color:var(--a);background:#f1fffc;box-shadow:inset 0 0 0 2px #d8fff7}.drop input{display:none}.upload{display:inline-block;background:var(--dark);color:white;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer}.help{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+.segment{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.seg{border:1px solid var(--line);background:white;padding:10px;border-radius:12px;font-weight:800}.seg.active{background:var(--dark);color:white}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #eef1f4}.row:first-child{border-top:0}.row strong{display:block;font-size:14px}.row small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.switch{position:relative;width:48px;height:28px}.switch input{opacity:0;position:absolute}.slider{position:absolute;inset:0;border-radius:99px;background:#d0d5dd;transition:.2s}.slider:after{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:white;box-shadow:0 2px 6px #0003;transition:.2s}.switch input:checked+.slider{background:var(--a)}.switch input:checked+.slider:after{transform:translateX(20px)}
+.primary,.secondary{width:100%;border:0;border-radius:16px;padding:14px;font-size:16px;font-weight:900;cursor:pointer}.primary{color:white;background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 12px 26px #16a6a03d}.primary:disabled{opacity:.45;box-shadow:none;cursor:not-allowed}.secondary{background:white;border:1px solid var(--line);margin-top:10px}
+.note{margin-top:14px;border:1px solid #fde68a;background:#fffbeb;color:#92400e;padding:11px 12px;border-radius:12px;font-size:11px;line-height:1.55}
+.rules{display:grid;gap:8px;margin-top:12px}.rule{font-size:12px;background:#f8fafc;border:1px solid #edf2f7;padding:9px 10px;border-radius:12px}.rule strong{display:block;font-size:12px;margin-bottom:2px}
+.previewTop{padding:18px 20px;border-bottom:1px solid #eef1f4;display:flex;justify-content:space-between;align-items:center;gap:10px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{padding:10px 13px;border-radius:12px;font-weight:900;border:1px solid var(--line);background:white}.actions .saveAll{background:var(--dark);color:white;border-color:var(--dark)}
+.results{padding:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.result{border:1px solid var(--line);border-radius:20px;background:#fbfcfd;overflow:hidden}.resultHead{padding:12px 14px;border-bottom:1px solid #eef1f4;display:flex;align-items:center;justify-content:space-between;gap:8px}.resultHead strong{font-size:14px}.tags{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 12px}.tag{font-size:10px;background:white;border:1px solid #e6eaef;color:#475467;border-radius:999px;padding:6px 8px;font-weight:700}.canvasWrap{padding:12px 14px 0}.canvasBox{border-radius:16px;background:linear-gradient(135deg,#e9eef5,#f8fafc);display:grid;place-items:center;min-height:270px;overflow:hidden}.canvasBox canvas{max-width:100%;max-height:420px;border-radius:14px;box-shadow:0 18px 50px #10182826}.resultActions{display:flex;gap:8px;padding:12px 14px 14px}.resultActions button{flex:1;border:1px solid var(--line);background:white;padding:11px;border-radius:12px;font-weight:800}.resultActions .save{background:var(--dark);border-color:var(--dark);color:white}
+.empty{padding:58px 20px;text-align:center;color:var(--muted)}.empty .ico{font-size:44px;margin-bottom:10px}
+.footerMini{padding:0 18px 18px;color:var(--muted);font-size:11px}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.results{grid-template-columns:1fr}.badge{display:none}.previewTop{align-items:flex-start;flex-direction:column}.actions{width:100%}.actions button{flex:1}}
+</style>
+</head>
+<body>
+<main>
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">P</div>
+        <div>
+          <h1>Selfie Privacy Lab</h1>
+          <div class="sub">自撮りの身バレ防止・匿名化 精度アップ版（4パターン同時生成）</div>
+        </div>
+      </div>
+      <div class="badge">MVP v0.3</div>
+    </header>
+
+    <div class="layout">
+      <section class="card">
+        <div class="inside">
+          <div class="title">① 写真をドラッグ＆ドロップ</div>
+          <label class="drop" id="dropZone">
+            <div>
+              <div style="font-size:36px;margin-bottom:10px">📸</div>
+              <span class="upload">写真を選択</span>
+              <div class="help" id="fileName">ここへドロップ / JPG・PNG・HEIC（ブラウザが読める形式）</div>
+            </div>
+            <input id="file" type="file" accept="image/*">
+          </label>
+
+          <div class="sp"></div>
+          <div class="title">② 身バレ防止レベル</div>
+          <div class="segment">
+            <button class="seg" data-level="weak">弱</button>
+            <button class="seg active" data-level="medium">中</button>
+            <button class="seg" data-level="strong">強</button>
+          </div>
+
+          <div class="sp"></div>
+          <div class="title">③ ランダム変換する項目</div>
+          <div class="row"><div><strong>服装</strong><small>清楚 / 私服 / パジャマ / ワンピ / カジュアル</small></div><label class="switch"><input id="outfitOn" type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="row"><div><strong>髪型</strong><small>元画像寄せ＋結び髪 / 片側だけ肩の後ろ など</small></div><label class="switch"><input id="hairOn" type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="row"><div><strong>背景</strong><small>部屋 / 白壁 / 一人暮らし / カフェ風 / 夜の室内 / 屋外お出かけ</small></div><label class="switch"><input id="bgOn" type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="row"><div><strong>お顔スタンプ</strong><small>白飛ばし / ハート / くま / 星 / ペンギン風 / 丸系かわいい</small></div><label class="switch"><input id="faceOn" type="checkbox" checked><span class="slider"></span></label></div>
+
+          <div class="sp"></div>
+          <div class="title">④ 精度アップ設定</div>
+          <div class="row"><div><strong>元画像の雰囲気を維持</strong><small>高いほど人物の見た目を残す</small></div><input id="preserve" type="range" min="40" max="95" value="72"></div>
+          <div class="row"><div><strong>髪型の自然さ</strong><small>高いほど元画像寄せを優先</small></div><input id="hairNatural" type="range" min="40" max="95" value="82"></div>
+          <div class="row"><div><strong>顔スタンプ位置を自動調整</strong><small>対応ブラウザでは顔位置を検出して配置</small></div><label class="switch"><input id="autoFace" type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="row"><div><strong>背景の差分を強める</strong><small>4枚の背景をなるべく別系統にする</small></div><label class="switch"><input id="strongBgDiff" type="checkbox" checked><span class="slider"></span></label></div>
+          <div class="row"><div><strong>4枚のバリエーション差</strong><small>高いほど4枚を違う組み合わせにする</small></div><input id="variation" type="range" min="40" max="100" value="78"></div>
+
+          <button class="primary" id="generate" disabled>🎲 4パターン生成</button>
+          <button class="secondary" id="again" hidden>↻ もう一度変換</button>
+
+          <div class="rules">
+            <div class="rule"><strong>今回の動き</strong>アップした1枚から、身バレしにくいようにランダム変換したJPEGを4種類作ります。</div>
+            <div class="rule"><strong>4枚の差別化</strong>同じ回の4枚は、服装・髪型・背景・スタンプがなるべく被らないように分散します。</div>
+            <div class="rule"><strong>保存形式</strong>保存はJPEG。Canvas書き出しなので、元画像のEXIF（撮影日時やGPS）は引き継ぎません。</div>
+          </div>
+
+          <div class="note">※ v0.3では4枚同時出力・再生成・JPEG保存に加えて、精度アップ設定と顔スタンプ自動位置調整の土台を追加。本格的なAI服装変更 / 髪型変更 / 背景差し替えは、次に安全なAPI側を接続します。</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="previewTop">
+          <div>
+            <div class="title" style="margin:0 0 2px">仕上がり 4パターン</div>
+            <div class="sub">気に入らない場合は「もう一度変換」で別の4種類を再生成</div>
+          </div>
+          <div class="actions">
+            <button class="saveAll" id="saveAll" hidden>4枚まとめて保存</button>
+          </div>
+        </div>
+
+        <div class="results" id="results">
+          <div class="empty" id="empty">
+            <div class="ico">🖼️</div>
+            <strong>ここに4パターン表示されます</strong>
+            <div class="help">左から写真を選んで「4パターン生成」を押してね</div>
+          </div>
+        </div>
+        <div class="footerMini">髪型ルール：元画像の雰囲気に寄せつつ、「結び髪」「片方だけ肩の後ろへ」をランダムで混ぜる想定です。</div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script>
+/* ==============================
+   CTI方式の編集ポイント
+   ① 服装候補: OUTFITS
+   ② 髪型候補: HAIRS
+   ③ 背景候補: BACKGROUNDS
+   ④ 顔スタンプ候補: STICKERS
+   ⑤ AI連携は今後この下に API_ENDPOINT を追加
+   ============================== */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const state = {
+  img: null,
+  fileBase: 'privacy',
+  level: 'medium',
+  outfit: true,
+  hair: true,
+  bg: true,
+  face: true,
+  preserve: 72,
+  hairNatural: 82,
+  autoFace: true,
+  strongBgDiff: true,
+  variation: 78,
+  detectedFace: null,
+  variants: []
+};
+
+const OUTFITS = [
+  { key:'clean', label:'清楚系', color:'#f0efe9' },
+  { key:'casual', label:'私服系', color:'#476d8a' },
+  { key:'pajama', label:'パジャマ系', color:'#d7bfdf' },
+  { key:'onepiece', label:'ワンピ系', color:'#222936' },
+  { key:'natural', label:'カジュアル系', color:'#8c715e' },
+  { key:'girly', label:'やわらか私服', color:'#d798aa' }
+];
+const HAIRS = [
+  { key:'base', label:'元画像寄せ' },
+  { key:'tied', label:'結び髪' },
+  { key:'oneback', label:'片側だけ肩の後ろ' },
+  { key:'softpart', label:'寄せ＋分け目少し変更' },
+  { key:'tiedsoft', label:'ゆるく結んだ感じ' }
+];
+const BACKGROUNDS = [
+  { key:'room', label:'部屋', palette:['rgba(241,229,220,.44)','rgba(160,125,105,.22)'] },
+  { key:'whitewall', label:'白壁', palette:['rgba(255,255,255,.78)','rgba(236,240,245,.55)'] },
+  { key:'soloroom', label:'女の子の一人暮らし', palette:['rgba(255,223,238,.30)','rgba(215,183,166,.22)'] },
+  { key:'cafe', label:'カフェ風', palette:['rgba(233,214,190,.36)','rgba(150,114,86,.28)'] },
+  { key:'night', label:'夜の室内', palette:['rgba(18,28,68,.52)','rgba(88,67,110,.36)'] },
+  { key:'outing', label:'屋外お出かけ', palette:['rgba(194,230,219,.30)','rgba(105,155,145,.20)'] }
+];
+const STICKERS = [
+  { key:'white', label:'白飛ばし', emoji:'' },
+  { key:'heart', label:'ハート', emoji:'💗' },
+  { key:'bear', label:'くま', emoji:'🐻' },
+  { key:'star', label:'星', emoji:'⭐' },
+  { key:'penguin', label:'ペンギン風', emoji:'🐧' },
+  { key:'roundcute', label:'丸系かわいい', emoji:'🎀' }
+];
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function takeDistributed(source, count){
+  const s = shuffle(source);
+  const out = [];
+  for(let i=0;i<count;i++) out.push(s[i % s.length]);
+  return out;
+}
+function getStrength(){
+  return state.level === 'weak'
+    ? { blur:8, mask:.80, tint:.18, outfitAlpha:.46 }
+    : state.level === 'strong'
+    ? { blur:26, mask:.58, tint:.36, outfitAlpha:.62 }
+    : { blur:16, mask:.69, tint:.27, outfitAlpha:.53 };
+}
+
+function loadFile(file){
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    state.img = img;
+    state.fileBase = (file.name || 'privacy').replace(/\.[^.]+$/, '');
+    $('#fileName').textContent = file.name;
+    $('#generate').disabled = false;
+    $('#again').hidden = false;
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
+$('#file').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if(f) loadFile(f);
+});
+
+const dropZone = $('#dropZone');
+['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, e => {
+  e.preventDefault();
+  dropZone.classList.add('drag');
+}));
+['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => {
+  e.preventDefault();
+  if(ev === 'drop'){
+    dropZone.classList.remove('drag');
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(f) loadFile(f);
+  } else {
+    dropZone.classList.remove('drag');
+  }
+}));
+
+$$('.seg').forEach(btn => btn.addEventListener('click', () => {
+  $$('.seg').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  state.level = btn.dataset.level;
+}));
+$('#outfitOn').onchange = e => state.outfit = e.target.checked;
+$('#hairOn').onchange = e => state.hair = e.target.checked;
+$('#bgOn').onchange = e => state.bg = e.target.checked;
+$('#faceOn').onchange = e => state.face = e.target.checked;
+$('#preserve').oninput = e => state.preserve = +e.target.value;
+$('#hairNatural').oninput = e => state.hairNatural = +e.target.value;
+$('#autoFace').onchange = e => state.autoFace = e.target.checked;
+$('#strongBgDiff').onchange = e => state.strongBgDiff = e.target.checked;
+$('#variation').oninput = e => state.variation = +e.target.value;
+
+function makeVariants(){
+  const outfits = takeDistributed(OUTFITS, 4);
+  let hairs = takeDistributed(HAIRS, 4);
+  if(state.hairNatural >= 80){
+    hairs = [HAIRS[0], HAIRS[2], HAIRS[1], HAIRS[3]];
+  }
+  const bgs = takeDistributed(BACKGROUNDS, 4);
+  const stickers = takeDistributed(STICKERS, 4);
+  state.variants = Array.from({length:4}, (_, i) => ({
+    id: i+1,
+    outfit: state.outfit ? outfits[i] : null,
+    hair: state.hair ? hairs[i] : null,
+    bg: state.bg ? bgs[i] : null,
+    sticker: state.face ? stickers[i] : null,
+    stampX: state.detectedFace ? state.detectedFace.x : 50 + (-6 + Math.random()*12),
+    stampY: state.detectedFace ? state.detectedFace.y : 19 + Math.random()*6,
+    stampScale: .95 + Math.random()*.20,
+    torsoY: 53 + (-4 + Math.random()*7),
+    torsoH: 40 + Math.random()*9,
+    imageData: null
+  }));
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+function cover(ctx,img,w,h){
+  const sc = Math.max(w/img.naturalWidth,h/img.naturalHeight);
+  const iw = img.naturalWidth*sc, ih = img.naturalHeight*sc;
+  ctx.drawImage(img,(w-iw)/2,(h-ih)/2,iw,ih);
+}
+
+function drawHairOverlay(ctx, w, h, hair){
+  const topY = h * .04;
+  const headY = h * .14;
+  const headH = h * .26;
+  const leftX = w * .28;
+  const rightX = w * .72;
+  ctx.save();
+  ctx.globalAlpha = .22;
+  ctx.fillStyle = '#111';
+
+  if(hair.key === 'tied' || hair.key === 'tiedsoft'){
+    ctx.beginPath();
+    ctx.ellipse(w*.78, h*.22, w*.07, h*.08, .25, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = .18;
+    ctx.beginPath();
+    ctx.moveTo(w*.40, topY);
+    ctx.quadraticCurveTo(w*.50, h*.02, w*.60, topY);
+    ctx.lineTo(w*.66, headY+h*.16);
+    ctx.lineTo(w*.34, headY+h*.16);
+    ctx.closePath();
+    ctx.fill();
+  } else if(hair.key === 'oneback'){
+    ctx.beginPath();
+    ctx.moveTo(leftX, topY);
+    ctx.quadraticCurveTo(w*.22, headY+h*.06, w*.25, headY+h*.26);
+    ctx.quadraticCurveTo(w*.30, headY+h*.36, w*.37, headY+h*.48);
+    ctx.lineTo(w*.43, headY+h*.46);
+    ctx.quadraticCurveTo(w*.38, headY+h*.30, w*.37, headY+h*.18);
+    ctx.quadraticCurveTo(w*.36, headY+h*.07, w*.42, topY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = .12;
+    ctx.beginPath();
+    ctx.moveTo(w*.48, topY);
+    ctx.quadraticCurveTo(w*.54, h*.08, w*.58, topY);
+    ctx.lineTo(w*.59, headY+h*.08);
+    ctx.lineTo(w*.49, headY+h*.06);
+    ctx.closePath();
+    ctx.fill();
+  } else if(hair.key === 'softpart'){
+    ctx.beginPath();
+    ctx.moveTo(w*.34, topY);
+    ctx.quadraticCurveTo(w*.48, h*.00, w*.66, topY);
+    ctx.lineTo(w*.62, headY+h*.13);
+    ctx.quadraticCurveTo(w*.51, h*.10, w*.47, headY+h*.16);
+    ctx.quadraticCurveTo(w*.43, h*.11, w*.37, headY+h*.11);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(leftX, topY);
+    ctx.quadraticCurveTo(w*.22, headY+h*.05, w*.23, headY+h*.22);
+    ctx.quadraticCurveTo(w*.24, headY+h*.36, w*.31, headY+h*.50);
+    ctx.lineTo(w*.40, headY+h*.48);
+    ctx.quadraticCurveTo(w*.35, headY+h*.26, w*.36, headY+h*.10);
+    ctx.quadraticCurveTo(w*.37, h*.04, w*.44, topY);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(rightX, topY);
+    ctx.quadraticCurveTo(w*.78, headY+h*.05, w*.77, headY+h*.22);
+    ctx.quadraticCurveTo(w*.76, headY+h*.36, w*.69, headY+h*.50);
+    ctx.lineTo(w*.60, headY+h*.48);
+    ctx.quadraticCurveTo(w*.65, headY+h*.26, w*.64, headY+h*.10);
+    ctx.quadraticCurveTo(w*.63, h*.04, w*.56, topY);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawSticker(ctx, w, h, sticker, xPct, yPct, scale){
+  if(!sticker) return;
+  const size = Math.min(w,h) * 0.30 * scale;
+  const cx = w * xPct / 100;
+  const cy = h * yPct / 100;
+  ctx.save();
+  ctx.translate(cx, cy);
+  if(sticker.key === 'white'){
+    const rg = ctx.createRadialGradient(0,0,size*.02,0,0,size*.55);
+    rg.addColorStop(0,'rgba(255,255,255,1)');
+    rg.addColorStop(.7,'rgba(255,255,255,.98)');
+    rg.addColorStop(1,'rgba(255,255,255,.02)');
+    ctx.fillStyle = rg;
+    ctx.beginPath();
+    ctx.arc(0,0,size*.56,0,Math.PI*2);
+    ctx.fill();
+  } else {
+    ctx.shadowColor = 'rgba(0,0,0,.18)';
+    ctx.shadowBlur = size*.06;
+    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.beginPath();
+    ctx.arc(0,0,size*.54,0,Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.font = `${size*.78}px Apple Color Emoji, Segoe UI Emoji, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(sticker.emoji, 0, size*.02);
+  }
+  ctx.restore();
+}
+
+function renderVariant(variant){
+  const img = state.img;
+  const maxW = 900, maxH = 1180;
+  const ratio = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
+  const w = Math.round(img.naturalWidth * ratio);
+  const h = Math.round(img.naturalHeight * ratio);
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  const st = getStrength();
+
+  if(variant.bg){
+    ctx.save();
+    ctx.filter = `blur(${st.blur}px) saturate(.72)`;
+    cover(ctx, img, w, h);
+    ctx.restore();
+
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0, variant.bg.palette[0]);
+    g.addColorStop(1, variant.bg.palette[1]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+
+    const pw = w * st.mask;
+    const ph = h * .92;
+    const px = (w - pw) / 2;
+    const py = h * .04;
+    ctx.save();
+    roundRect(ctx, px, py, pw, ph, Math.min(w,h) * .08);
+    ctx.clip();
+    cover(ctx, img, w, h);
+    ctx.restore();
+  } else {
+    cover(ctx, img, w, h);
+  }
+
+  if(variant.outfit){
+    const y = h * variant.torsoY / 100;
+    const hh = h * variant.torsoH / 100;
+    const x = w * .19;
+    const ww = w * .62;
+    ctx.save();
+    roundRect(ctx, x, y, ww, Math.min(hh, h-y), w*.08);
+    ctx.clip();
+    ctx.globalCompositeOperation = 'soft-light';
+    ctx.globalAlpha = st.outfitAlpha;
+    ctx.fillStyle = variant.outfit.color;
+    ctx.fillRect(x,y,ww,hh);
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = st.tint;
+    ctx.fillRect(x,y,ww,hh);
+    ctx.restore();
+  }
+
+  if(variant.hair){
+    drawHairOverlay(ctx, w, h, variant.hair);
+  }
+
+  if(variant.sticker){
+    drawSticker(ctx, w, h, variant.sticker, variant.stampX, variant.stampY, variant.stampScale);
+  }
+
+  variant.imageData = canvas.toDataURL('image/jpeg', .92);
+  return canvas;
+}
+
+function makeTag(text){
+  const span = document.createElement('span');
+  span.className = 'tag';
+  span.textContent = text;
+  return span;
+}
+
+function renderResults(){
+  const wrap = $('#results');
+  wrap.innerHTML = '';
+  state.variants.forEach((variant, idx) => {
+    const card = document.createElement('div');
+    card.className = 'result';
+    const head = document.createElement('div');
+    head.className = 'resultHead';
+    head.innerHTML = `<strong>パターン ${idx+1}</strong><span class="tag">JPEG</span>`;
+    card.appendChild(head);
+
+    const tags = document.createElement('div');
+    tags.className = 'tags';
+    if(variant.outfit) tags.appendChild(makeTag(`服装: ${variant.outfit.label}`));
+    if(variant.hair) tags.appendChild(makeTag(`髪型: ${variant.hair.label}`));
+    if(variant.bg) tags.appendChild(makeTag(`背景: ${variant.bg.label}`));
+    if(variant.sticker) tags.appendChild(makeTag(`スタンプ: ${variant.sticker.label}`));
+    card.appendChild(tags);
+
+    const canvasWrap = document.createElement('div');
+    canvasWrap.className = 'canvasWrap';
+    const canvasBox = document.createElement('div');
+    canvasBox.className = 'canvasBox';
+    canvasBox.appendChild(renderVariant(variant));
+    canvasWrap.appendChild(canvasBox);
+    card.appendChild(canvasWrap);
+
+    const actions = document.createElement('div');
+    actions.className = 'resultActions';
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save';
+    saveBtn.textContent = '保存';
+    saveBtn.onclick = () => downloadVariant(variant, idx);
+    const againBtn = document.createElement('button');
+    againBtn.textContent = 'これだけ再抽選';
+    againBtn.onclick = () => rerollOne(idx);
+    actions.append(saveBtn, againBtn);
+    card.appendChild(actions);
+
+    wrap.appendChild(card);
+  });
+  $('#saveAll').hidden = false;
+}
+
+function downloadVariant(variant, idx){
+  const a = document.createElement('a');
+  a.href = variant.imageData;
+  a.download = `${state.fileBase}-pattern-${idx+1}.jpg`;
+  a.click();
+}
+
+function rerollOne(idx){
+  const used = state.variants.filter((_, i) => i !== idx);
+  function pickUnique(pool, getter){
+    const usedKeys = used.map(v => getter(v)?.key).filter(Boolean);
+    const candidates = pool.filter(x => !usedKeys.includes(x.key));
+    const src = candidates.length ? candidates : pool;
+    return src[Math.floor(Math.random()*src.length)];
+  }
+  const variant = state.variants[idx];
+  if(state.outfit) variant.outfit = pickUnique(OUTFITS, v => v.outfit);
+  if(state.hair) variant.hair = pickUnique(HAIRS, v => v.hair);
+  if(state.bg) variant.bg = pickUnique(BACKGROUNDS, v => v.bg);
+  if(state.face) variant.sticker = pickUnique(STICKERS, v => v.sticker);
+  variant.stampX = 50 + (-6 + Math.random()*12);
+  variant.stampY = 19 + Math.random()*6;
+  variant.stampScale = .95 + Math.random()*.20;
+  variant.torsoY = 53 + (-4 + Math.random()*7);
+  variant.torsoH = 40 + Math.random()*9;
+  renderResults();
+}
+
+async function detectFaceCenter(){
+  state.detectedFace = null;
+  if(!state.autoFace || !state.img) return;
+  try{
+    if('FaceDetector' in window){
+      const detector = new FaceDetector({fastMode:true,maxDetectedFaces:1});
+      const faces = await detector.detect(state.img);
+      if(faces && faces[0] && faces[0].boundingBox){
+        const b = faces[0].boundingBox;
+        state.detectedFace = {
+          x: ((b.x + b.width/2) / state.img.naturalWidth) * 100,
+          y: ((b.y + b.height/2) / state.img.naturalHeight) * 100
+        };
+      }
+    }
+  }catch(e){
+    console.warn('FaceDetector unavailable; fallback position used.', e);
+  }
+}
+
+async function generateAll(){
+  if(!state.img) return;
+  await detectFaceCenter();
+  makeVariants();
+  $('#empty')?.remove();
+  renderResults();
+}
+
+$('#generate').onclick = generateAll;
+$('#again').onclick = generateAll;
+$('#saveAll').onclick = () => state.variants.forEach((v, i) => setTimeout(() => downloadVariant(v, i), i * 160));
+</script>
+</body>
+</html>

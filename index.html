@@ -359,6 +359,14 @@ function drawHairOverlay(ctx, w, h, hair){
 }
 
 function renderVariant(variant){
+    if(variant.imageData){
+    const aiImg = new Image();
+    aiImg.src = variant.imageData;
+    aiImg.style.maxWidth = '100%';
+    aiImg.style.maxHeight = '420px';
+    aiImg.style.borderRadius = '14px';
+    return aiImg;
+  }
   const img = state.img;
   const maxW = 900, maxH = 1180;
   const ratio = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);

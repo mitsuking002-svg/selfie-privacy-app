@@ -79,7 +79,13 @@ h1{margin:0;font-size:clamp(22px,4vw,34px);letter-spacing:-.03em}.sub{font-size:
           <div class="row"><div><strong>髪型の自然さ</strong><small>高いほど元画像寄せを優先</small></div><input id="hairNatural" type="range" min="40" max="95" value="82"></div>
 <div class="row"><div><strong>背景の差分を強める</strong><small>4枚の背景をなるべく別系統にする</small></div><label class="switch"><input id="strongBgDiff" type="checkbox" checked><span class="slider"></span></label></div>
           <div class="row"><div><strong>4枚のバリエーション差</strong><small>高いほど4枚を違う組み合わせにする</small></div><input id="variation" type="range" min="40" max="100" value="78"></div>
-
+　　　　　　<div class="row">
+  <div>
+    <strong>APP_TOKEN</strong>
+    <small>Supabaseで設定した合言葉を入力</small>
+  </div>
+  <input id="appToken" type="password" placeholder="APP_TOKEN" autocomplete="off">
+</div>
           <button class="primary" id="generate" disabled>🎲 4パターン生成</button>
           <button class="secondary" id="again" hidden>↻ もう一度変換</button>
 

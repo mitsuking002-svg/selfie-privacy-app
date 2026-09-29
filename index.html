@@ -128,20 +128,7 @@ h1{margin:0;font-size:clamp(22px,4vw,34px);letter-spacing:-.03em}.sub{font-size:
 const API_ENDPOINT = 'https://ctwcwnjjmujoigurndie.supabase.co/functions/v1/transform-selfie';
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-  const APP_TOKEN_STORAGE_KEY = 'selfiePrivacyAppToken';
-const appTokenInput = $('#appToken');
-
-appTokenInput.value = localStorage.getItem(APP_TOKEN_STORAGE_KEY) || '';
-
-appTokenInput.addEventListener('input', () => {
-  const token = appTokenInput.value.trim();
-
-  if(token){
-    localStorage.setItem(APP_TOKEN_STORAGE_KEY, token);
-  }else{
-    localStorage.removeItem(APP_TOKEN_STORAGE_KEY);
-  }
-});
+  
 const state = {
     sourceFile: null,
   　img: null,

@@ -266,9 +266,9 @@ function makeVariants(){
     hair: state.hair ? hairs[i] : null,
     bg: state.bg ? bgs[i] : null,
     sticker: state.face ? stickers[i] : null,
-    stampX: state.detectedFace ? state.detectedFace.x : 50 + (-6 + Math.random()*12),
-    stampY: state.detectedFace ? state.detectedFace.y : 19 + Math.random()*6,
-    stampScale: .95 + Math.random()*.20,
+    stampX: state.detectedFace ? state.detectedFace.x : 50 + (-4 + Math.random()*8),
+　　 stampY: state.detectedFace ? state.detectedFace.y + 4 : 24 + Math.random()*4,
+     stampScale: state.detectedFace ? 1.28 + Math.random()*.10 : 1.18 + Math.random()*.12,
     torsoY: 53 + (-4 + Math.random()*7),
     torsoH: 40 + Math.random()*9,
     imageData: null
@@ -359,33 +359,40 @@ function drawHairOverlay(ctx, w, h, hair){
 
 function drawSticker(ctx, w, h, sticker, xPct, yPct, scale){
   if(!sticker) return;
-  const size = Math.min(w,h) * 0.30 * scale;
+
+  const size = Math.min(w,h) * 0.40 * scale;
   const cx = w * xPct / 100;
   const cy = h * yPct / 100;
+
   ctx.save();
   ctx.translate(cx, cy);
+
   if(sticker.key === 'white'){
-    const rg = ctx.createRadialGradient(0,0,size*.02,0,0,size*.55);
+    ctx.filter = 'blur(10px)';
+    const rg = ctx.createRadialGradient(0,0,size*.10,0,0,size*.72);
     rg.addColorStop(0,'rgba(255,255,255,1)');
-    rg.addColorStop(.7,'rgba(255,255,255,.98)');
-    rg.addColorStop(1,'rgba(255,255,255,.02)');
+    rg.addColorStop(.72,'rgba(255,245,255,.98)');
+    rg.addColorStop(1,'rgba(255,255,255,.04)');
     ctx.fillStyle = rg;
     ctx.beginPath();
-    ctx.arc(0,0,size*.56,0,Math.PI*2);
+    ctx.ellipse(0, 0, size*.58, size*.66, 0, 0, Math.PI*2);
     ctx.fill();
+    ctx.filter = 'none';
   } else {
-    ctx.shadowColor = 'rgba(0,0,0,.18)';
+    ctx.shadowColor = 'rgba(0,0,0,.16)';
     ctx.shadowBlur = size*.06;
-    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.fillStyle = 'rgba(255,255,255,.97)';
     ctx.beginPath();
-    ctx.arc(0,0,size*.54,0,Math.PI*2);
+    ctx.arc(0,0,size*.62,0,Math.PI*2);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.font = `${size*.78}px Apple Color Emoji, Segoe UI Emoji, sans-serif`;
+
+    ctx.font = `${size*.86}px Apple Color Emoji, Segoe UI Emoji, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(sticker.emoji, 0, size*.02);
   }
+
   ctx.restore();
 }
 
@@ -527,9 +534,9 @@ function rerollOne(idx){
   if(state.hair) variant.hair = pickUnique(HAIRS, v => v.hair);
   if(state.bg) variant.bg = pickUnique(BACKGROUNDS, v => v.bg);
   if(state.face) variant.sticker = pickUnique(STICKERS, v => v.sticker);
-  variant.stampX = 50 + (-6 + Math.random()*12);
-  variant.stampY = 19 + Math.random()*6;
-  variant.stampScale = .95 + Math.random()*.20;
+  variant.stampX = state.detectedFace ? state.detectedFace.x : 50 + (-4 + Math.random()*8);
+  variant.stampY = state.detectedFace ? state.detectedFace.y + 4 : 24 + Math.random()*4;
+  variant.stampScale = state.detectedFace ? 1.28 + Math.random()*.10 : 1.18 + Math.random()*.12;
   variant.torsoY = 53 + (-4 + Math.random()*7);
   variant.torsoH = 40 + Math.random()*9;
   renderResults();

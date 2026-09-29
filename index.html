@@ -504,10 +504,71 @@ function rerollOne(idx){
 }
 
 async function generateAll(){
-  if(!state.img) return;
-  makeVariants();
-  $('#empty')?.remove();
-  renderResults();
+  if(!state.sourceFile) return;
+
+  const token = appTokenInput.value.trim();
+
+  if(!token){
+    alert('APP_TOKENを入力してください');
+    appTokenInput.focus();
+    return;
+  }
+
+  const generateBtn = $('#generate');
+  const againBtn = $('#again');
+
+  generateBtn.disabled = true;
+  againBtn.disabled = true;
+  generateBtn.textContent = 'AI変換中...';
+
+  try{
+    const formData = new FormData();
+    formData.append('image', state.sourceFile);
+
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'x-app-token': token
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error || 'AI変換に失敗しました');
+    }
+
+    state.variants = data.variants.map((v, i) => ({
+      id: i + 1,
+
+      outfit: v.outfit
+        ? { key: `ai-outfit-${i}`, label: v.outfit }
+        : null,
+
+      hair: v.hair
+        ? { key: `ai-hair-${i}`, label: v.hair }
+        : null,
+
+      bg: v.background
+        ? { key: `ai-bg-${i}`, label: v.background }
+        : null,
+
+      imageData: `data:${v.mime || 'image/jpeg'};base64,${v.b64}`
+    }));
+
+    $('#empty')?.remove();
+    renderResults();
+
+  }catch(error){
+    console.error(error);
+    alert('AI変換エラー: ' + error.message);
+
+  }finally{
+    generateBtn.disabled = false;
+    againBtn.disabled = false;
+    generateBtn.textContent = '🎲 4パターン生成';
+  }
 }
 
 $('#generate').onclick = generateAll;

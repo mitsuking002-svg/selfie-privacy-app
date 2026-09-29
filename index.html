@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Selfie Privacy Lab v0.3</title>
+<title>Selfie Privacy Lab v0.4</title>
 <style>
 :root{
   --bg:#f5f7fb;--card:#fff;--text:#101828;--muted:#667085;--line:#e4e7ec;
@@ -44,7 +44,7 @@ h1{margin:0;font-size:clamp(22px,4vw,34px);letter-spacing:-.03em}.sub{font-size:
           <div class="sub">自撮りの身バレ防止・匿名化 精度アップ版（4パターン同時生成）</div>
         </div>
       </div>
-      <div class="badge">MVP v0.3</div>
+      <div class="badge">MVP v0.4</div>
     </header>
 
     <div class="layout">
@@ -73,14 +73,11 @@ h1{margin:0;font-size:clamp(22px,4vw,34px);letter-spacing:-.03em}.sub{font-size:
           <div class="row"><div><strong>服装</strong><small>清楚 / 私服 / パジャマ / ワンピ / カジュアル</small></div><label class="switch"><input id="outfitOn" type="checkbox" checked><span class="slider"></span></label></div>
           <div class="row"><div><strong>髪型</strong><small>元画像寄せ＋結び髪 / 片側だけ肩の後ろ など</small></div><label class="switch"><input id="hairOn" type="checkbox" checked><span class="slider"></span></label></div>
           <div class="row"><div><strong>背景</strong><small>部屋 / 白壁 / 一人暮らし / カフェ風 / 夜の室内 / 屋外お出かけ</small></div><label class="switch"><input id="bgOn" type="checkbox" checked><span class="slider"></span></label></div>
-          <div class="row"><div><strong>お顔スタンプ</strong><small>白飛ばし / ハート / くま / 星 / ペンギン風 / 丸系かわいい</small></div><label class="switch"><input id="faceOn" type="checkbox" checked><span class="slider"></span></label></div>
-
-          <div class="sp"></div>
+<div class="sp"></div>
           <div class="title">④ 精度アップ設定</div>
           <div class="row"><div><strong>元画像の雰囲気を維持</strong><small>高いほど人物の見た目を残す</small></div><input id="preserve" type="range" min="40" max="95" value="72"></div>
           <div class="row"><div><strong>髪型の自然さ</strong><small>高いほど元画像寄せを優先</small></div><input id="hairNatural" type="range" min="40" max="95" value="82"></div>
-          <div class="row"><div><strong>顔スタンプ位置を自動調整</strong><small>対応ブラウザでは顔位置を検出して配置</small></div><label class="switch"><input id="autoFace" type="checkbox" checked><span class="slider"></span></label></div>
-          <div class="row"><div><strong>背景の差分を強める</strong><small>4枚の背景をなるべく別系統にする</small></div><label class="switch"><input id="strongBgDiff" type="checkbox" checked><span class="slider"></span></label></div>
+<div class="row"><div><strong>背景の差分を強める</strong><small>4枚の背景をなるべく別系統にする</small></div><label class="switch"><input id="strongBgDiff" type="checkbox" checked><span class="slider"></span></label></div>
           <div class="row"><div><strong>4枚のバリエーション差</strong><small>高いほど4枚を違う組み合わせにする</small></div><input id="variation" type="range" min="40" max="100" value="78"></div>
 
           <button class="primary" id="generate" disabled>🎲 4パターン生成</button>
@@ -88,11 +85,11 @@ h1{margin:0;font-size:clamp(22px,4vw,34px);letter-spacing:-.03em}.sub{font-size:
 
           <div class="rules">
             <div class="rule"><strong>今回の動き</strong>アップした1枚から、身バレしにくいようにランダム変換したJPEGを4種類作ります。</div>
-            <div class="rule"><strong>4枚の差別化</strong>同じ回の4枚は、服装・髪型・背景・スタンプがなるべく被らないように分散します。</div>
+            <div class="rule"><strong>4枚の差別化</strong>同じ回の4枚は、服装・髪型・背景がなるべく被らないように分散します。</div>
             <div class="rule"><strong>保存形式</strong>保存はJPEG。Canvas書き出しなので、元画像のEXIF（撮影日時やGPS）は引き継ぎません。</div>
           </div>
 
-          <div class="note">※ v0.3では4枚同時出力・再生成・JPEG保存に加えて、精度アップ設定と顔スタンプ自動位置調整の土台を追加。本格的なAI服装変更 / 髪型変更 / 背景差し替えは、次に安全なAPI側を接続します。</div>
+          <div class="note">※ v0.4では顔隠しをアプリから外し、服装・髪型・背景の3項目に集中。本格的なAI服装変更 / 髪型変更 / 背景差し替えは、次に安全なAPI側を接続します。</div>
         </div>
       </section>
 
@@ -126,8 +123,7 @@ h1{margin:0;font-size:clamp(22px,4vw,34px);letter-spacing:-.03em}.sub{font-size:
    ① 服装候補: OUTFITS
    ② 髪型候補: HAIRS
    ③ 背景候補: BACKGROUNDS
-   ④ 顔スタンプ候補: STICKERS
-   ⑤ AI連携は今後この下に API_ENDPOINT を追加
+   ④ AI連携は今後この下に API_ENDPOINT を追加
    ============================== */
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -138,13 +134,10 @@ const state = {
   outfit: true,
   hair: true,
   bg: true,
-  face: true,
   preserve: 72,
   hairNatural: 82,
-  autoFace: true,
   strongBgDiff: true,
   variation: 78,
-  detectedFace: null,
   variants: []
 };
 
@@ -171,15 +164,6 @@ const BACKGROUNDS = [
   { key:'night', label:'夜の室内', palette:['rgba(18,28,68,.52)','rgba(88,67,110,.36)'] },
   { key:'outing', label:'屋外お出かけ', palette:['rgba(194,230,219,.30)','rgba(105,155,145,.20)'] }
 ];
-const STICKERS = [
-  { key:'white', label:'白飛ばし', emoji:'' },
-  { key:'heart', label:'ハート', emoji:'💗' },
-  { key:'bear', label:'くま', emoji:'🐻' },
-  { key:'star', label:'星', emoji:'⭐' },
-  { key:'penguin', label:'ペンギン風', emoji:'🐧' },
-  { key:'roundcute', label:'丸系かわいい', emoji:'🎀' }
-];
-
 function shuffle(arr){
   const a = [...arr];
   for(let i=a.length-1;i>0;i--){
@@ -245,10 +229,8 @@ $$('.seg').forEach(btn => btn.addEventListener('click', () => {
 $('#outfitOn').onchange = e => state.outfit = e.target.checked;
 $('#hairOn').onchange = e => state.hair = e.target.checked;
 $('#bgOn').onchange = e => state.bg = e.target.checked;
-$('#faceOn').onchange = e => state.face = e.target.checked;
 $('#preserve').oninput = e => state.preserve = +e.target.value;
 $('#hairNatural').oninput = e => state.hairNatural = +e.target.value;
-$('#autoFace').onchange = e => state.autoFace = e.target.checked;
 $('#strongBgDiff').onchange = e => state.strongBgDiff = e.target.checked;
 $('#variation').oninput = e => state.variation = +e.target.value;
 
@@ -259,16 +241,11 @@ function makeVariants(){
     hairs = [HAIRS[0], HAIRS[2], HAIRS[1], HAIRS[3]];
   }
   const bgs = takeDistributed(BACKGROUNDS, 4);
-  const stickers = takeDistributed(STICKERS, 4);
   state.variants = Array.from({length:4}, (_, i) => ({
     id: i+1,
     outfit: state.outfit ? outfits[i] : null,
     hair: state.hair ? hairs[i] : null,
     bg: state.bg ? bgs[i] : null,
-    sticker: state.face ? stickers[i] : null,
-    stampX: state.detectedFace ? state.detectedFace.x : 50 + (-4 + Math.random()*8),
-　　 stampY: state.detectedFace ? state.detectedFace.y + 4 : 24 + Math.random()*4,
-     stampScale: state.detectedFace ? 1.28 + Math.random()*.10 : 1.18 + Math.random()*.12,
     torsoY: 53 + (-4 + Math.random()*7),
     torsoH: 40 + Math.random()*9,
     imageData: null
@@ -357,68 +334,6 @@ function drawHairOverlay(ctx, w, h, hair){
   ctx.restore();
 }
 
-function drawSticker(ctx, w, h, sticker, xPct, yPct, scale){
-  const size = Math.min(w,h) * 0.42 * scale;
-  const cx = w * xPct / 100;
-  const cy = h * yPct / 100;
-
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  // 顔型の白飛ばし
-  ctx.filter = 'blur(9px)';
-
-  const g = ctx.createRadialGradient(
-    0, -size * 0.05, size * 0.06,
-    0, 0, size * 0.72
-  );
-
-  g.addColorStop(0, 'rgba(255,250,255,1)');
-  g.addColorStop(0.72, 'rgba(255,245,255,.99)');
-  g.addColorStop(1, 'rgba(255,245,255,.05)');
-
-  ctx.fillStyle = g;
-
-  ctx.beginPath();
-
-  // 額
-  ctx.moveTo(0, -size * 0.58);
-
-  // 右こめかみ → 右頬
-  ctx.bezierCurveTo(
-    size * 0.36, -size * 0.56,
-    size * 0.52, -size * 0.25,
-    size * 0.50,  size * 0.08
-  );
-
-  // 右頬 → 顎
-  ctx.bezierCurveTo(
-    size * 0.47, size * 0.36,
-    size * 0.25, size * 0.58,
-    0,           size * 0.67
-  );
-
-  // 顎 → 左頬
-  ctx.bezierCurveTo(
-    -size * 0.25, size * 0.58,
-    -size * 0.47, size * 0.36,
-    -size * 0.50, size * 0.08
-  );
-
-  // 左頬 → 左こめかみ → 額
-  ctx.bezierCurveTo(
-    -size * 0.52, -size * 0.25,
-    -size * 0.36, -size * 0.56,
-    0,            -size * 0.58
-  );
-
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.filter = 'none';
-  ctx.restore();
-}
-
 function renderVariant(variant){
   const img = state.img;
   const maxW = 900, maxH = 1180;
@@ -478,10 +393,6 @@ function renderVariant(variant){
     drawHairOverlay(ctx, w, h, variant.hair);
   }
 
-  if(variant.sticker){
-    drawSticker(ctx, w, h, variant.sticker, variant.stampX, variant.stampY, variant.stampScale);
-  }
-
   variant.imageData = canvas.toDataURL('image/jpeg', .92);
   return canvas;
 }
@@ -509,7 +420,6 @@ function renderResults(){
     if(variant.outfit) tags.appendChild(makeTag(`服装: ${variant.outfit.label}`));
     if(variant.hair) tags.appendChild(makeTag(`髪型: ${variant.hair.label}`));
     if(variant.bg) tags.appendChild(makeTag(`背景: ${variant.bg.label}`));
-    if(variant.sticker) tags.appendChild(makeTag(`スタンプ: ${variant.sticker.label}`));
     card.appendChild(tags);
 
     const canvasWrap = document.createElement('div');
@@ -556,38 +466,13 @@ function rerollOne(idx){
   if(state.outfit) variant.outfit = pickUnique(OUTFITS, v => v.outfit);
   if(state.hair) variant.hair = pickUnique(HAIRS, v => v.hair);
   if(state.bg) variant.bg = pickUnique(BACKGROUNDS, v => v.bg);
-  if(state.face) variant.sticker = pickUnique(STICKERS, v => v.sticker);
-  variant.stampX = state.detectedFace ? state.detectedFace.x : 50 + (-4 + Math.random()*8);
-  variant.stampY = state.detectedFace ? state.detectedFace.y + 4 : 24 + Math.random()*4;
-  variant.stampScale = state.detectedFace ? 1.28 + Math.random()*.10 : 1.18 + Math.random()*.12;
   variant.torsoY = 53 + (-4 + Math.random()*7);
   variant.torsoH = 40 + Math.random()*9;
   renderResults();
 }
 
-async function detectFaceCenter(){
-  state.detectedFace = null;
-  if(!state.autoFace || !state.img) return;
-  try{
-    if('FaceDetector' in window){
-      const detector = new FaceDetector({fastMode:true,maxDetectedFaces:1});
-      const faces = await detector.detect(state.img);
-      if(faces && faces[0] && faces[0].boundingBox){
-        const b = faces[0].boundingBox;
-        state.detectedFace = {
-          x: ((b.x + b.width/2) / state.img.naturalWidth) * 100,
-          y: ((b.y + b.height/2) / state.img.naturalHeight) * 100
-        };
-      }
-    }
-  }catch(e){
-    console.warn('FaceDetector unavailable; fallback position used.', e);
-  }
-}
-
 async function generateAll(){
   if(!state.img) return;
-  await detectFaceCenter();
   makeVariants();
   $('#empty')?.remove();
   renderResults();

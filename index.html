@@ -497,8 +497,11 @@ async function generateAll(){
   generateBtn.textContent = 'AI変換中...';
 
   try{
+    const { imageBlob, maskBlob } = await buildEditMask();
+    
     const formData = new FormData();
-    formData.append('image', state.sourceFile);
+　　formData.append('image', imageBlob, 'source.jpg');
+　　formData.append('mask', maskBlob, 'mask.png');
 
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
